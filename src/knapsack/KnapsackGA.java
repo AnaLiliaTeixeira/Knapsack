@@ -1,7 +1,7 @@
 package knapsack;
 
 import java.util.Random;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 
 public class KnapsackGA {
 	private static final int N_GENERATIONS = 500;
@@ -28,6 +28,7 @@ public class KnapsackGA {
 		for (int generation = 0; generation < N_GENERATIONS; generation++) {
 
 			// Step1 - Calculate Fitness
+			
 			for (int i = 0; i < POP_SIZE; i++) {
 				population[i].measureFitness();
 			}
@@ -81,27 +82,35 @@ public class KnapsackGA {
 		 */
 		final Individual[] bestIndividual = {population[0]}; // Initialize with the first individual
 	
-		int num_threads = Runtime.getRuntime().availableProcessors();
-		Thread[] threads = new Thread[num_threads];
+		int numThreads = Runtime.getRuntime().availableProcessors();
+		Thread[] threads = new Thread[numThreads];
 	
-		for (int tid = 0; tid < num_threads; tid++) {
-			int chunkSize = POP_SIZE / num_threads;
+		parallelize(numThreads, (index) -> {
+			if (population[index].fitness > bestIndividual[0].fitness) {
+				synchronized (this) {
+					bestIndividual[0] = population[index];
+				}
+			}
+		}, numThreads, threads);
+	
+		return bestIndividual[0];
+	}
+	
+
+	private static void parallelize(int numThreads, Consumer<Integer> task, int limit, Thread[] threads) {
+		for (int tid = 0; tid < numThreads; tid++) {
+			int chunkSize = limit / numThreads;
 			int start = tid * chunkSize;
 			int end = (tid + 1) * chunkSize;
-	
 			for (int i = start; i < end; i++) {
 				final int index = i;
 				threads[tid] = new Thread(() -> {
-					if (population[index].fitness > bestIndividual[0].fitness) {
-						synchronized (this) {
-							bestIndividual[0] = population[index];
-						}
-					}
+					task.accept(index);
 				});
 				threads[tid].start();
 			}
 		}
-	
+
 		for (Thread t : threads) {
 			try {
 				t.join();
@@ -109,10 +118,6 @@ public class KnapsackGA {
 				e.printStackTrace();
 			}
 		}
-	
-		return bestIndividual[0];
 	}
-	
-
 
 }
