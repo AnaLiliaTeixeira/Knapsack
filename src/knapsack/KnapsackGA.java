@@ -1,6 +1,7 @@
 package knapsack;
 
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class KnapsackGA {
 	private static final int N_GENERATIONS = 500;
@@ -73,17 +74,45 @@ public class KnapsackGA {
 		return best;
 	}
 
+
 	private Individual bestOfPopulation() {
 		/*
 		 * Returns the best individual of the population.
 		 */
-		Individual best = population[0];
-		for (Individual other : population) {
-			if (other.fitness > best.fitness) {
-				best = other;
+		final Individual[] bestIndividual = {population[0]}; // Initialize with the first individual
+	
+		int num_threads = Runtime.getRuntime().availableProcessors();
+		Thread[] threads = new Thread[num_threads];
+	
+		for (int tid = 0; tid < num_threads; tid++) {
+			int chunkSize = POP_SIZE / num_threads;
+			int start = tid * chunkSize;
+			int end = (tid + 1) * chunkSize;
+	
+			for (int i = start; i < end; i++) {
+				final int index = i;
+				threads[tid] = new Thread(() -> {
+					if (population[index].fitness > bestIndividual[0].fitness) {
+						synchronized (this) {
+							bestIndividual[0] = population[index];
+						}
+					}
+				});
+				threads[tid].start();
 			}
 		}
-		return best;
+	
+		for (Thread t : threads) {
+			try {
+				t.join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	
+		return bestIndividual[0];
 	}
+	
+
 
 }
