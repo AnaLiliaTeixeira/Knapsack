@@ -4,19 +4,19 @@ import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
-public class KnapsackGA {
+public class KnapsackGA_parallel {
 	private static final int N_GENERATIONS = 500;
 	private static final int POP_SIZE = 100000;
 	private static final double PROB_MUTATION = 0.5;
 	private static final int TOURNAMENT_SIZE = 3;
-    private static final int NUM_THREADS = 2;
+    private static final int NUM_THREADS = 4;
     private static final Thread[] threads = new Thread[NUM_THREADS];
 
 	private ThreadLocalRandom r = ThreadLocalRandom.current();
 
 	private Individual[] population = new Individual[POP_SIZE];
 
-	public KnapsackGA() {
+	public KnapsackGA_parallel() {
 		populateInitialPopulationRandomly();
 	}
 
