@@ -1,6 +1,7 @@
 package knapsack;
 
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
 public class KnapsackGA {
@@ -8,8 +9,11 @@ public class KnapsackGA {
 	private static final int POP_SIZE = 100000;
 	private static final double PROB_MUTATION = 0.5;
 	private static final int TOURNAMENT_SIZE = 3;
+	private static final int NUM_THREADS = Runtime.getRuntime().availableProcessors();
 
-	private Random r = new Random();
+	private static Thread[] threads = new Thread[NUM_THREADS];
+
+	private ThreadLocalRandom r = ThreadLocalRandom.current();
 
 	private Individual[] population = new Individual[POP_SIZE];
 
@@ -19,9 +23,9 @@ public class KnapsackGA {
 
 	private void populateInitialPopulationRandomly() {
 		/* Creates a new population, made of random individuals */
-		for (int i = 0; i < POP_SIZE; i++) {
-			population[i] = Individual.createRandom(r);
-		}
+		// for (int i = 0; i < POP_SIZE; i++) {
+			parallelize((index) -> { population[index] = Individual.createRandom(r); });
+		// }
 	}
 
 	public void run() {
@@ -82,30 +86,27 @@ public class KnapsackGA {
 		 */
 		final Individual[] bestIndividual = {population[0]}; // Initialize with the first individual
 	
-		int numThreads = Runtime.getRuntime().availableProcessors();
-		Thread[] threads = new Thread[numThreads];
-	
-		parallelize(numThreads, (index) -> {
+		parallelize((index) -> {
 			if (population[index].fitness > bestIndividual[0].fitness) {
-				synchronized (this) {
 					bestIndividual[0] = population[index];
-				}
 			}
-		}, numThreads, threads);
+		});
 	
 		return bestIndividual[0];
 	}
 	
 
-	private static void parallelize(int numThreads, Consumer<Integer> task, int limit, Thread[] threads) {
-		for (int tid = 0; tid < numThreads; tid++) {
-			int chunkSize = limit / numThreads;
+	private static void parallelize(Consumer<Integer> task) {
+		int chunkSize = POP_SIZE / NUM_THREADS;
+		for (int tid = 0; tid < NUM_THREADS; tid++) {
 			int start = tid * chunkSize;
 			int end = (tid + 1) * chunkSize;
 			for (int i = start; i < end; i++) {
 				final int index = i;
 				threads[tid] = new Thread(() -> {
-					task.accept(index);
+					synchronized(task) { 
+						task.accept(index);
+					}
 				});
 				threads[tid].start();
 			}
