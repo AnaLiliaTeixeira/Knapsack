@@ -41,18 +41,18 @@ public class KnapsackGAMethod3 {
 
 			// Task 1 - Calculate Fitness
 			// phaser.register();
-			Thread fitnessThread = new Thread(() -> {
+			// Thread fitnessThread = new Thread(() -> {
 				// do {
 					measureFitness();
 					// phaser.arriveAndAwaitAdvance();
 				// } while (!phaser.isTerminated());
-			});
-			fitnessThread.start();
+			// });
+			// fitnessThread.start();
 			
 			// Task2 - Print the best individual so far.			
 			// phaser.register();
 			final int generationFinal = generation;
-			Thread bestOfPopulationThread = new Thread(() -> {
+			// Thread bestOfPopulationThread = new Thread(() -> {
 				// do {
 					Individual best = bestOfPopulation();
 					System.out.println("Best at generation " + generationFinal + " is " + best + " with "
@@ -60,15 +60,15 @@ public class KnapsackGAMethod3 {
 					// phaser.arriveAndAwaitAdvance();
 				// } while (!phaser.isTerminated());
 
-			});
-			bestOfPopulationThread.start();
+			// });
+			// bestOfPopulationThread.start();
 
 			// Step3 - Find parents to mate (cross-over)
 			
 			// phaser.register();
 			Individual[] newPopulation = new Individual[POP_SIZE];
 			newPopulation[0] = population[0]; // The best individual remains
-			Thread performCrossoverThread = new Thread(() -> {
+			// Thread performCrossoverThread = new Thread(() -> {
 				// do {
 					synchronized(newPopulation) {
 						performeCrossover(newPopulation);
@@ -76,12 +76,12 @@ public class KnapsackGAMethod3 {
 					// phaser.arriveAndAwaitAdvance();
 				// } while (!phaser.isTerminated());
 
-			});
-			performCrossoverThread.start();
+			// });
+			// performCrossoverThread.start();
 
 			// Step4 - Mutate
 			// phaser.register();
-			Thread performMutationThread = new Thread(() -> {
+			// Thread performMutationThread = new Thread(() -> {
 				// do {
 					synchronized(newPopulation) {
 						performMutation(newPopulation);
@@ -89,22 +89,22 @@ public class KnapsackGAMethod3 {
 					// phaser.arriveAndAwaitAdvance();
 				// } while (!phaser.isTerminated());
 
-			});
+			// });
 			
-			performMutationThread.start();
+			// performMutationThread.start();
 
 			// phaser.arriveAndDeregister(); // releases the first barrier
 
 
 			// Wait for all slave threads to wait
-			try {
-                fitnessThread.join();
-				bestOfPopulationThread.join();
-                performCrossoverThread.join();
-                performMutationThread.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+			// try {
+            //     fitnessThread.join();
+			// 	bestOfPopulationThread.join();
+            //     performCrossoverThread.join();
+            //     performMutationThread.join();
+            // } catch (InterruptedException e) {
+            //     e.printStackTrace();
+            // }
 		}
 	}
 
