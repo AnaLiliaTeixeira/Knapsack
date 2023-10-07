@@ -2,7 +2,16 @@ package knapsack;
 
 public class Main {
 	public static void main(String[] args) {
-		KnapsackGA_parallel ga = new KnapsackGA_parallel();
-		ga.run();
+		long[] executionTimesMethod1 = new long[1]; // 1 eh o nmr de iteracoes
+		for (int i = 0; i < executionTimesMethod1.length; i++) {
+			long startTime = System.nanoTime();
+
+			KnapsackGAMethod3 ga = new KnapsackGAMethod3();
+			ga.run();
+
+			long endTime = System.nanoTime();
+			executionTimesMethod1[i] = endTime - startTime;
+			System.out.println("\n" + (endTime - startTime) + "\n");
+		}
 	}
 }

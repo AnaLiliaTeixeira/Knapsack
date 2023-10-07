@@ -2,9 +2,8 @@ package knapsack;
 
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Consumer;
 
-public class KnapsackGA_parallel {
+public class KnapsackGAMethod1 {
 	private static final int N_GENERATIONS = 500;
 	private static final int POP_SIZE = 100000;
 	private static final double PROB_MUTATION = 0.5;
@@ -16,24 +15,24 @@ public class KnapsackGA_parallel {
 
 	private Individual[] population = new Individual[POP_SIZE];
 
-	public KnapsackGA_parallel() {
+	public KnapsackGAMethod1() {
 		populateInitialPopulationRandomly();
 	}
 
 	private void populateInitialPopulationRandomly() {
 		/* Creates a new population, made of random individuals */
-		parallelize((index) -> {
+		Parallelyze.parallelyze((index) -> {
 			population[index] = Individual.createRandom(r);
-        });
+        }, POP_SIZE, NUM_THREADS, threads, 0);
 	}
 
 	public void run() {
 		for (int generation = 0; generation < N_GENERATIONS; generation++) {
 
 			// Step1 - Calculate Fitness
-			for (int i = 0; i < POP_SIZE; i++) {
-				population[i].measureFitness();
-			}
+			Parallelyze.parallelyze((index) -> {
+				population[index].measureFitness();
+			}, POP_SIZE, NUM_THREADS, threads, 0);
 
 			// Step2 - Print the best individual so far.
 			Individual best = bestOfPopulation();
@@ -80,36 +79,16 @@ public class KnapsackGA_parallel {
 	private Individual bestOfPopulation() {
 		/*
 		 * Returns the best individual of the population.
+		 * se eu fizesse individual best = population[0] não daria por isso criei um array que não muda (o tamanho
+		 * é sempre o mesmo) e aquilo que muda é o seu inteiro (único elemento é aquele que eu quero guardar - best)
 		 */
-		Individual best = population[0];
-		for (Individual other : population) {
-			if (other.fitness > best.fitness) {
-				best = other;
-			}
-		}
-		return best;
-	}
+		Individual[] best = {population[0]};
 
-    private static void parallelize(Consumer<Integer> task) {
-		int chunkSize = POP_SIZE / NUM_THREADS;
-		for (int tid = 0; tid < NUM_THREADS; tid++) {
-			int start = tid * chunkSize;
-			int end = tid < NUM_THREADS ? (tid + 1) * chunkSize : POP_SIZE;
-			threads[tid] = new Thread(() -> {
-				for (int i = start; i < end; i++) {
-					final int index = i;
-					task.accept(index);
-				}
-			});
-			threads[tid].start();
-		}
-
-		for (Thread t : threads) {
-			try {
-				t.join();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+		Parallelyze.parallelyze((index) -> {
+			if (population[index].fitness > best[0].fitness) {
+				best[0] = population[index];
 			}
-		}
+		}, POP_SIZE, NUM_THREADS, threads, 0);
+		return best[0];
 	}
 }
