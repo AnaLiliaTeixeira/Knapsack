@@ -140,7 +140,7 @@ public class KnapsackGAMethod4 {
 		// phaser.register();
 		// phaser.register();
 		Individual best[] = {population[r.nextInt(POP_SIZE)]};
-		for (int i = 0; i < tournamentSize; i++) {
+		for (int i = 0; i < POP_SIZE; i++) {
 		// new Thread() {
 		// 	public void run() {
 		// 		do {

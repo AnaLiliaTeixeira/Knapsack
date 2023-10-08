@@ -9,14 +9,17 @@ public class KnapsackGAMethod3 {
 	private static final int POP_SIZE = 100000;
 	private static final double PROB_MUTATION = 0.5;
 	private static final int TOURNAMENT_SIZE = 3;
-    private static final int NUM_THREADS = 4;
-    private static final Thread[] threads = new Thread[NUM_THREADS];
+
+    private int NUM_THREADS;
+    private final Thread[] threads;
 
 	private ThreadLocalRandom r = ThreadLocalRandom.current();
 
 	private Individual[] population = new Individual[POP_SIZE];
 
-	public KnapsackGAMethod3() {
+	public KnapsackGAMethod3(int n) {
+		this.NUM_THREADS = n;
+		this.threads = new Thread[NUM_THREADS];
 		populateInitialPopulationRandomly();
 	}
 
@@ -161,12 +164,16 @@ public class KnapsackGAMethod3 {
 		/*
 		 * Returns the best individual of the population.
 		 */
-		Individual best = population[0];
-		for (Individual other : population) {
-			if (other.fitness > best.fitness) {
-				best = other;
+
+		Individual best[] = {population[r.nextInt(POP_SIZE)]};
+		Parallelyze.parallelyze((start, end) -> {
+			for (int i = start; i < end; i++) {
+				if (population[i].fitness > best[0].fitness) {
+					best[0] = population[i];
+				}
 			}
-		}
-		return best;
+		}, POP_SIZE, NUM_THREADS, threads, 0);
+
+		return best[0];
 	}
 }
