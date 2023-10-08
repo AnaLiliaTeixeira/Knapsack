@@ -22,8 +22,10 @@ public class KnapsackGAMethod2 {
 
 	private void populateInitialPopulationRandomly() {
 		/* Creates a new population, made of random individuals */
-		Parallelyze.parallelyze((index) -> {
-			population[index] = Individual.createRandom(r);
+		Parallelyze.parallelyze((start, end) -> {
+			for (int i = start; i < end; i++) {	
+				population[i] = Individual.createRandom(r);
+			}
         }, POP_SIZE, NUM_THREADS, threads, 0);
 	}
 

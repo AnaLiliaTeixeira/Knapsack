@@ -21,8 +21,10 @@ public class KnapsackGAMethod1 {
 
 	private void populateInitialPopulationRandomly() {
 		/* Creates a new population, made of random individuals */
-		Parallelyze.parallelyze((index) -> {
-			population[index] = Individual.createRandom(r);
+		Parallelyze.parallelyze((start, end) -> {
+			for (int i = start; i < end; i++) {			
+				population[i] = Individual.createRandom(r);
+			}
         }, POP_SIZE, NUM_THREADS, threads, 0);
 	}
 
@@ -30,8 +32,10 @@ public class KnapsackGAMethod1 {
 		for (int generation = 0; generation < N_GENERATIONS; generation++) {
 
 			// Step1 - Calculate Fitness
-			Parallelyze.parallelyze((index) -> {
-				population[index].measureFitness();
+			Parallelyze.parallelyze((start, end) -> {
+				for (int i = start; i < end; i++) {				
+					population[i].measureFitness();
+				}
 			}, POP_SIZE, NUM_THREADS, threads, 0);
 
 			// Step2 - Print the best individual so far.
@@ -84,9 +88,11 @@ public class KnapsackGAMethod1 {
 		 */
 		Individual[] best = {population[0]};
 
-		Parallelyze.parallelyze((index) -> {
-			if (population[index].fitness > best[0].fitness) {
-				best[0] = population[index];
+		Parallelyze.parallelyze((start, end) -> {
+			for (int i = start; i < end; i++) {			
+				if (population[i].fitness > best[0].fitness) {
+				best[0] = population[i];
+				}
 			}
 		}, POP_SIZE, NUM_THREADS, threads, 0);
 		return best[0];

@@ -8,8 +8,6 @@ public class KnapsackGA {
 	private static final int POP_SIZE = 100000;
 	private static final double PROB_MUTATION = 0.5;
 	private static final int TOURNAMENT_SIZE = 3;
-    private static final int NUM_THREADS = 2;
-    private static final Thread[] threads = new Thread[NUM_THREADS];
 
 	private ThreadLocalRandom r = ThreadLocalRandom.current();
 
@@ -21,9 +19,9 @@ public class KnapsackGA {
 
 	private void populateInitialPopulationRandomly() {
 		/* Creates a new population, made of random individuals */
-		Parallelyze.parallelyze((index) -> {
-			population[index] = Individual.createRandom(r);
-        }, POP_SIZE, NUM_THREADS, threads, 0);
+		for (int i = 0; i < POP_SIZE; i++) {
+			population[i] = Individual.createRandom(r);
+		}
 	}
 
 	public void run() {

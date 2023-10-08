@@ -22,8 +22,11 @@ public class KnapsackGAMethod3 {
 
 	private void populateInitialPopulationRandomly() {
 		/* Creates a new population, made of random individuals */
-		Parallelyze.parallelyze((index) -> {
-			population[index] = Individual.createRandom(r);
+		Parallelyze.parallelyze((start, end) -> {
+			for (int i= start; i < end; i++) {
+				population[i] = Individual.createRandom(r);
+
+			}
         }, POP_SIZE, NUM_THREADS, threads, 0);
 	}
 	
@@ -110,26 +113,31 @@ public class KnapsackGAMethod3 {
 
 	// Step1 - Calculate Fitness
 	private void measureFitness() {
-		Parallelyze.parallelyze((index) -> {
-			population[index].measureFitness();
+		Parallelyze.parallelyze((start, end) -> {
+			for (int i = start; i < end; i++) {			
+				population[i].measureFitness();
+			}
 		}, POP_SIZE, NUM_THREADS, threads, 0);
 	}
 
 	private void performeCrossover(Individual[] newPopulation) {
-		Parallelyze.parallelyze((index) -> {
-			// We select two parents, using a tournament.
+		Parallelyze.parallelyze((start, end) -> {
+			for (int i = start; i < end; i++) {			// We select two parents, using a tournament.
 			Individual parent1 = tournament(TOURNAMENT_SIZE, r);
 			Individual parent2 = tournament(TOURNAMENT_SIZE, r);
 
-			newPopulation[index] = parent1.crossoverWith(parent2, r);
+			newPopulation[i] = parent1.crossoverWith(parent2, r);
+			}
 		}, POP_SIZE, NUM_THREADS, threads, 1);
 	}
 
 	private void performMutation(Individual[] newPopulation) {
-		Parallelyze.parallelyze((index) -> {
-			if (r.nextDouble() < PROB_MUTATION) {
-				newPopulation[index].mutate(r);
-			}
+		Parallelyze.parallelyze((start, end) -> {
+			for (int i = start; i < end; i++) {
+				if (r.nextDouble() < PROB_MUTATION) {
+					newPopulation[i].mutate(r);
+				}
+		}
 		}, POP_SIZE, NUM_THREADS, threads, 1);
 		population = newPopulation;
 	}

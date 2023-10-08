@@ -6,7 +6,7 @@ public class Main {
 		for (int i = 0; i < executionTimesMethod1.length; i++) {
 			long startTime = System.nanoTime();
 
-			KnapsackGAMethod2 ga = new KnapsackGAMethod2();
+			KnapsackGAMethod3 ga = new KnapsackGAMethod3();
 			ga.run();
 
 			long endTime = System.nanoTime();
