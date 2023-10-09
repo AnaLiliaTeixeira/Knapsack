@@ -2,8 +2,6 @@ package knapsack;
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Main {
 
@@ -12,24 +10,25 @@ public class Main {
 
 		try {
 			FileWriter csvWriter = new FileWriter("results.csv");
-
+			
 			// Cabeçalhos das colunas
             // csvWriter.write("Sequencial,Method 3\n");
-
+			int max_threads = Runtime.getRuntime().availableProcessors();
 			
 			for (int i = 1; i <= ITERATIONS; i++) {
 				StringBuilder header = new StringBuilder("Sequencial,");
 				StringBuilder line = new StringBuilder();
-				long durationMethodSequencial = runKnapsackGASequencial();
-				for (int currentThread : new int[]{2, 4}) {
+				// long durationMethodSequencial = runKnapsackGASequencial();
+				// long durationMethodTest = runKnapsackGAMethodTest();
+				for (int currentThread = max_threads; currentThread > 1; currentThread /= 2) {
 					// long durationMethod1 = runKnapsackGAMethod1();
 					// header.append("Method 1:Thread " + currentThread + ",");
 					// long durationMethod2 = runKnapsackGAMethod2();
 					// header.append("Method 2:Thread " + currentThread + ",");
 
-					long durationMethod3 = runKnapsackGAMethod3(currentThread);
-					header.append("Method 3:Thread " + currentThread + ",");
-					line.append(durationMethodSequencial + "," + durationMethod3 + ",");
+					// long durationMethod3 = runKnapsackGAMethod3(currentThread);
+					// header.append("Method 3:Thread " + currentThread + ",");
+					// line.append(durationMethodSequencial + "," + durationMethod1 + ",");
 
 				}
 				csvWriter.write(header.toString());
@@ -56,6 +55,13 @@ public class Main {
 	private static long runKnapsackGAMethod1 () {
 		long startTime = System.nanoTime();
 		KnapsackGAMethod1 method = new KnapsackGAMethod1();
+		method.run();
+		long endTime = System.nanoTime();
+		return endTime - startTime;
+	}
+	private static long runKnapsackGAMethodTest () {
+		long startTime = System.nanoTime();
+		KnapsackGATest method = new KnapsackGATest(2);
 		method.run();
 		long endTime = System.nanoTime();
 		return endTime - startTime;

@@ -3,6 +3,7 @@ import pandas as pd
 from numpy import mean
 from numpy import std
 from scipy.stats import kruskal
+import matplotlib.pyplot as plt
 
 # Read from the scores.csv using pandas
 df = pd.read_csv('results.csv')
@@ -24,3 +25,6 @@ if p_value < alpha:
     print("Há diferenças significativas entre os métodos.")
 else:
     print("Não há diferenças significativas entre os métodos.")
+
+plt.boxplot([sequencial_results, method3_results], labels=['Sequencial', 'Method 1:Thread 2'])
+plt.show()
