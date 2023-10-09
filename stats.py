@@ -9,7 +9,7 @@ df = pd.read_csv('results.csv')
 
 # Realize um teste estatístico (por exemplo, teste t) para cada método
 sequencial_results = df["Sequencial"]
-method3_results = df["Method 3"]
+method3_results = df["Method 1:Thread 2"]
 
 # summarize
 print('data1: mean=%.3f stdv=%.3f' % (mean(sequencial_results), std(sequencial_results)))
