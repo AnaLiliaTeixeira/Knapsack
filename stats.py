@@ -1,30 +1,42 @@
-# Import package
+# Importe as bibliotecas necessárias
 import pandas as pd
-from numpy import mean
-from numpy import std
 from scipy.stats import kruskal
 import matplotlib.pyplot as plt
 
-# Read from the scores.csv using pandas
+# Leia o arquivo CSV com os resultados
 df = pd.read_csv('results.csv')
 
-# Realize um teste estatístico (por exemplo, teste t) para cada método
-sequencial_results = df["Sequencial"]
-method3_results = df["Method 1:Thread 2"]
+# Selecione a coluna do método sequencial
+sequencial_results = df['Sequencial']
 
-# summarize
-print('data1: mean=%.3f stdv=%.3f' % (mean(sequencial_results), std(sequencial_results)))
-print('data2: mean=%.3f stdv=%.3f' % (mean(method3_results), std(method3_results)))
+# Inicialize uma lista para armazenar os p-values
+p_values = []
 
-# Realize o Teste de Kruskal-Wallis
-h_statistic, p_value = kruskal(sequencial_results, method3_results)
+# Inicialize uma lista para armazenar os nomes dos métodos
+method_names = []
 
-# Verifique se há diferenças significativas
-alpha = 0.05  # Nível de significância (geralmente 0.05)
-if p_value < alpha:
-    print("Há diferenças significativas entre os métodos.")
-else:
-    print("Não há diferenças significativas entre os métodos.")
+# Percorra as colunas do DataFrame, exceto a primeira que é a coluna 'Sequencial'
+for column in df.columns[1:]:
+    method_results = df[column]
+    
+    # Compare o método atual com o método sequencial usando o teste de Kruskal-Wallis
+    h_statistic, p_value = kruskal(sequencial_results, method_results)
+    
+    # Armazene o p-value na lista
+    p_values.append(p_value)
+    
+    # Armazene o nome do método na lista
+    method_names.append(column)
 
-plt.boxplot([sequencial_results, method3_results], labels=['Sequencial', 'Method 1:Thread 2'])
+# Imprima os valores de p-value para cada comparação
+for i, column in enumerate(method_names):
+    print(f'P-Value ({column} vs Sequencial): {p_values[i]}')
+
+# Realize o teste de significância (neste caso, o exemplo verifica se p < 0.05)
+alpha = 0.05
+significant_methods = [method_names[i] for i, p in enumerate(p_values) if p < alpha]
+print(f'Métodos com diferenças significativas em relação ao sequencial: {significant_methods}')
+
+# Crie um gráfico de boxplot
+plt.boxplot([sequencial_results] + [df[column] for column in method_names], labels=df.columns)
 plt.show()
