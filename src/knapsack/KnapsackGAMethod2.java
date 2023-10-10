@@ -38,12 +38,13 @@ public class KnapsackGAMethod2 {
 			  return phase >= N_GENERATIONS || registeredParties == 0;
 			}
 		  };
-		// Parallelyze.parallelyze((generation) -> {
 			phaser.register();
+			
 			phaser.register();
 		    new Thread() {
 				public void run() {
 					do {
+						boolean printed = false;
 
 						// Step1 - Calculate Fitness
 						for (int i = 0; i < POP_SIZE; i++) {
@@ -52,8 +53,11 @@ public class KnapsackGAMethod2 {
 
 						// Step2 - Print the best individual so far.
 						Individual best = bestOfPopulation();
-						System.out.println("Best at generation " + /*generation*/ phaser.getPhase() + " is " + best + " with "
-								+ best.fitness);
+						if (!printed) {
+							System.out.println("Best at generation " + /*generation*/ phaser.getPhase() + " is " + best + " with "
+									+ best.fitness);
+							printed = true;
+						}
 
 						// Step3 - Find parents to mate (cross-over)
 						Individual[] newPopulation = new Individual[POP_SIZE];
@@ -80,9 +84,7 @@ public class KnapsackGAMethod2 {
 	  		}.start();
 	//  }
 		phaser.arriveAndDeregister(); // releases the first barrier
-	
-		// , N_GENERATIONS, NUM_THREADS, threads, 0);
-	}
+		}
 
 	private Individual tournament(int tournamentSize, Random r) {
 		/*

@@ -1,6 +1,7 @@
 # Importe as bibliotecas necessárias
 import pandas as pd
 from scipy.stats import kruskal
+from scipy.stats import mannwhitneyu
 import matplotlib.pyplot as plt
 
 # Leia o arquivo CSV com os resultados
@@ -32,10 +33,21 @@ for column in df.columns[1:]:
 for i, column in enumerate(method_names):
     print(f'P-Value ({column} vs Sequencial): {p_values[i]}')
 
-# Realize o teste de significância (neste caso, o exemplo verifica se p < 0.05)
+
+# compare samples
+stat, p = mannwhitneyu(data1, data2)
+print('Statistics=%.3f, p=%.3f' % (stat, p))
+# interpret
 alpha = 0.05
-significant_methods = [method_names[i] for i, p in enumerate(p_values) if p < alpha]
-print(f'Métodos com diferenças significativas em relação ao sequencial: {significant_methods}')
+if p > alpha:
+    print('Same distribution (fail to reject H0)')
+else:
+    print('Different distribution (reject H0)')
+
+# # Realize o teste de significância (neste caso, o exemplo verifica se p < 0.05)
+# alpha = 0.05
+# significant_methods = [method_names[i] for i, p in enumerate(p_values) if p < alpha]
+# print(f'Métodos com diferenças significativas em relação ao sequencial: {significant_methods}')
 
 # Crie um gráfico de boxplot
 plt.boxplot([sequencial_results] + [df[column] for column in method_names], labels=df.columns)

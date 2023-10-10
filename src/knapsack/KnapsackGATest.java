@@ -30,6 +30,7 @@ public class KnapsackGATest {
         }
     }
 
+    
     public void run() {
         final Phaser phaser = new Phaser() {
             protected boolean onAdvance(int phase, int registeredParties) {
@@ -40,25 +41,24 @@ public class KnapsackGATest {
         for (int generation = 0; generation < N_GENERATIONS; generation++) {
             // phaser.register();
             final int gen = generation;
-            Individual[] newPopulation = population;
+            // Individual[] newPopulation = new Individual[POP_SIZE];
             // newPopulation[0] = population[0]; // The best individual remains
+            Individual[] newPopulation = population;
 
             Parallelyze.parallelyze((start, end) -> {
                 phaser.register(); // Register for the first barrier with parties = 1
 
                 // Step1 - Calculate Fitness
-                // phaser.register();
                 for (int i = start; i < end; i++) {
 					population[i].measureFitness();
                 }
+        
                 phaser.arriveAndAwaitAdvance(); // End of step 1
-                // phaser.arriveAndDeregister(); // End of the barrier
 
-                // Step2 - Print the best individual so far
+                // Step2 - Print the best individual so far  
                 Individual[] best = new Individual[1];
-                // phaser.register();
-                best[0] = bestOfPopulation();
 
+                best[0] = bestOfPopulation(start, end);
                 if (end == POP_SIZE) {
                     System.out.println("Best at generation " + gen + " is " + best[0] + " with "
                             + best[0].fitness);
@@ -66,37 +66,32 @@ public class KnapsackGATest {
                 phaser.arriveAndAwaitAdvance(); // End of step 2
 
                 // Step3 - Find parents to mate (cross-over)
-                // phaser.register();
+                //falta skipar o [0]
+                // newPopulation[0] = population[0]; // The best individual remains
+                for (int i = start; i < end; i++) {
 
-                for (int i = start + 1; i < end; i++) {
                     // We select two parents, using a tournament.
-                    Individual parent1 = null;
-                    Individual parent2 = null;
-                    // synchronized (newPopulation) {
-                        parent1 = tournament(TOURNAMENT_SIZE, r);
-                        parent2 = tournament(TOURNAMENT_SIZE, r);
-                        newPopulation[i] = parent1.crossoverWith(parent2, r);
-                    // }
+                    Individual parent1 = tournament(TOURNAMENT_SIZE, r);
+                    Individual parent2 = tournament(TOURNAMENT_SIZE, r);
+                    newPopulation[i] = parent1.crossoverWith(parent2, r);
                 }
                 phaser.arriveAndAwaitAdvance(); // End of step 3
 
                 // Step4 - Mutate
-                // phaser.register();
-                for (int i = start + 1; i < end; i++) {
+                for (int i = start; i < end; i++) {
                     if (r.nextDouble() < PROB_MUTATION) {
-                        // synchronized(newPopulation) {
-                            newPopulation[i].mutate(r);
-                        // }
+                        newPopulation[i].mutate(r);
                     }
-                }
+                }           
                 phaser.arriveAndAwaitAdvance(); // End of step 4
-                
-                population = newPopulation;
 
+                // synchronized(population) {}
+                population = newPopulation;
+                
                 phaser.arriveAndDeregister(); // End of the barrier
             }, POP_SIZE, NUM_THREADS, threads, 0);
+            // System.arraycopy(newPopulation, 0, population, 0, POP_SIZE);
 
-            // Wait for all threads to complete this generation
         }
 
     }
@@ -116,14 +111,26 @@ public class KnapsackGATest {
         return best;
     }
 
-    private Individual bestOfPopulation() {
-        /*
-         * Returns the best individual of the population.
-         */
-        Individual best = population[0];
-        for (Individual other : population) {
-            if (other.fitness > best.fitness) {
-                best = other;
+    // se paralelizar esta função fica mais lento
+    // private Individual bestOfPopulation(Individual[] newPopulation) {
+    //     /*
+    //      * Returns the best individual of the population.
+    //      */
+    //     Individual best = newPopulation[0];
+    //     for (Individual other : newPopulation) {
+    //         if (other.fitness > best.fitness) {
+    //             best = other;
+    //         }
+    //     }
+    //     return best;
+    // }
+
+    // Updated method to find the best individual in a specific range
+    private Individual bestOfPopulation(int start, int end) {
+        Individual best = population[start];
+        for (int i = start + 1; i < end; i++) {
+            if (population[i].fitness > best.fitness) {
+                best = population[i];
             }
         }
         return best;
