@@ -34,15 +34,15 @@ for i, column in enumerate(method_names):
     print(f'P-Value ({column} vs Sequencial): {p_values[i]}')
 
 
-# compare samples
-stat, p = mannwhitneyu(data1, data2)
-print('Statistics=%.3f, p=%.3f' % (stat, p))
-# interpret
-alpha = 0.05
-if p > alpha:
-    print('Same distribution (fail to reject H0)')
-else:
-    print('Different distribution (reject H0)')
+# # compare samples
+# stat, p = mannwhitneyu(data1, data2)
+# print('Statistics=%.3f, p=%.3f' % (stat, p))
+# # interpret
+# alpha = 0.05
+# if p > alpha:
+#     print('Same distribution (fail to reject H0)')
+# else:
+#     print('Different distribution (reject H0)')
 
 # # Realize o teste de significância (neste caso, o exemplo verifica se p < 0.05)
 # alpha = 0.05

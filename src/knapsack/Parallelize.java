@@ -2,9 +2,9 @@ package knapsack;
 
 import java.util.function.BiConsumer;
 
-public class Parallelyze {
+public class Parallelize {
     
-    static void parallelyze(BiConsumer<Integer, Integer> task, int popSize, int numThreads, Thread[] threads, int k) {
+    static void parallelize(BiConsumer<Integer, Integer> task, int popSize, int numThreads, Thread[] threads, int k) {
 		int chunkSize = (popSize - k) / numThreads;
 		for (int tid = 0; tid < numThreads; tid++) {
 			int start = tid * chunkSize + k;

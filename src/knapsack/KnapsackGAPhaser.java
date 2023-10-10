@@ -4,7 +4,7 @@ import java.util.Random;
 import java.util.concurrent.Phaser;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class KnapsackGATest {
+public class KnapsackGAPhaser {
     private static final int N_GENERATIONS = 500;
     private static final int POP_SIZE = 100000;
     private static final double PROB_MUTATION = 0.5;
@@ -17,7 +17,7 @@ public class KnapsackGATest {
 
     private Individual[] population = new Individual[POP_SIZE];
 
-    public KnapsackGATest(int n) {
+    public KnapsackGAPhaser(int n) {
         this.NUM_THREADS = n;
         this.threads = new Thread[NUM_THREADS];
         populateInitialPopulationRandomly();
@@ -45,7 +45,7 @@ public class KnapsackGATest {
             // newPopulation[0] = population[0]; // The best individual remains
             Individual[] newPopulation = population;
 
-            Parallelyze.parallelyze((start, end) -> {
+            Parallelize.parallelize((start, end) -> {
                 phaser.register(); // Register for the first barrier with parties = 1
 
                 // Step1 - Calculate Fitness

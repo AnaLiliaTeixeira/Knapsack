@@ -1,22 +1,23 @@
 package knapsack;
 
 import java.util.Random;
+import java.util.concurrent.Phaser;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class KnapsackGAMethod1 {
+public class KnapsackGAParallelize {
 	private static final int N_GENERATIONS = 500;
 	private static final int POP_SIZE = 100000;
 	private static final double PROB_MUTATION = 0.5;
 	private static final int TOURNAMENT_SIZE = 3;
 
-	private int NUM_THREADS;
+    private int NUM_THREADS;
     private final Thread[] threads;
 
 	private ThreadLocalRandom r = ThreadLocalRandom.current();
 
 	private Individual[] population = new Individual[POP_SIZE];
 
-	public KnapsackGAMethod1(int n) {
+	public KnapsackGAParallelize(int n) {
 		this.NUM_THREADS = n;
 		this.threads = new Thread[NUM_THREADS];
 		populateInitialPopulationRandomly();
@@ -24,49 +25,61 @@ public class KnapsackGAMethod1 {
 
 	private void populateInitialPopulationRandomly() {
 		/* Creates a new population, made of random individuals */
-		Parallelyze.parallelyze((start, end) -> {
-			for (int i = start; i < end; i++) {			
+		Parallelize.parallelize((start, end) -> {
+			for (int i= start; i < end; i++) {
 				population[i] = Individual.createRandom(r);
+
 			}
         }, POP_SIZE, NUM_THREADS, threads, 0);
 	}
-
+	
 	public void run() {
+				   
 		for (int generation = 0; generation < N_GENERATIONS; generation++) {
 
-			// Step1 - Calculate Fitness
-			Parallelyze.parallelyze((start, end) -> {
-				for (int i = start; i < end; i++) {				
+			// Task 1 - Calculate Fitness
+			Parallelize.parallelize((start, end) -> {
+				for (int i = start; i < end; i++) {			
 					population[i].measureFitness();
 				}
 			}, POP_SIZE, NUM_THREADS, threads, 0);
-
-			// Step2 - Print the best individual so far.
+			
+			// Task2 - Print the best individual so far.			
+			final int generationFinal = generation;
 			Individual best = bestOfPopulation();
-			System.out.println("Best at generation " + generation + " is " + best + " with "
-					+ best.fitness);
+			System.out.println("Best at generation " + generationFinal + " is " + best + " with "
+			+ best.fitness);
 
 			// Step3 - Find parents to mate (cross-over)
 			Individual[] newPopulation = new Individual[POP_SIZE];
 			newPopulation[0] = population[0]; // The best individual remains
-
-			for (int i = 1; i < POP_SIZE; i++) {
-				// We select two parents, using a tournament.
-				Individual parent1 = tournament(TOURNAMENT_SIZE, r);
-				Individual parent2 = tournament(TOURNAMENT_SIZE, r);
-
-				newPopulation[i] = parent1.crossoverWith(parent2, r);
-			}
+			// synchronized(newPopulation) {
+				Parallelize.parallelize((start, end) -> {
+					for (int i = start; i < end; i++) {			
+						// We select two parents, using a tournament.
+						Individual parent1 = tournament(TOURNAMENT_SIZE, r);
+						Individual parent2 = tournament(TOURNAMENT_SIZE, r);
+			
+						newPopulation[i] = parent1.crossoverWith(parent2, r);
+					}
+				}, POP_SIZE, NUM_THREADS, threads, 1);
+			// }
 
 			// Step4 - Mutate
-			for (int i = 1; i < POP_SIZE; i++) {
-				if (r.nextDouble() < PROB_MUTATION) {
-					newPopulation[i].mutate(r);
-				}
-			}
-			population = newPopulation;
+			// synchronized(newPopulation) {
+				Parallelize.parallelize((start, end) -> {
+					for (int i = start; i < end; i++) {
+						if (r.nextDouble() < PROB_MUTATION) {
+							newPopulation[i].mutate(r);
+						}
+					}
+				}, POP_SIZE, NUM_THREADS, threads, 1);
+
+				population = newPopulation;
+			// }
 		}
 	}
+
 
 	private Individual tournament(int tournamentSize, Random r) {
 		/*
@@ -86,18 +99,17 @@ public class KnapsackGAMethod1 {
 	private Individual bestOfPopulation() {
 		/*
 		 * Returns the best individual of the population.
-		 * se eu fizesse individual best = population[0] não daria por isso criei um array que não muda (o tamanho
-		 * é sempre o mesmo) e aquilo que muda é o seu inteiro (único elemento é aquele que eu quero guardar - best)
 		 */
-		Individual[] best = {population[0]};
 
-		Parallelyze.parallelyze((start, end) -> {
-			for (int i = start; i < end; i++) {			
+		Individual best[] = {population[r.nextInt(POP_SIZE)]};
+		Parallelize.parallelize((start, end) -> {
+			for (int i = start; i < end; i++) {
 				if (population[i].fitness > best[0].fitness) {
-				best[0] = population[i];
+					best[0] = population[i];
 				}
 			}
 		}, POP_SIZE, NUM_THREADS, threads, 0);
+
 		return best[0];
 	}
 }
