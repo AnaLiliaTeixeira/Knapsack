@@ -1,7 +1,6 @@
 package knapsack;
 
 import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class KnapsackGA {
 	private static final int N_GENERATIONS = 500;
@@ -9,7 +8,7 @@ public class KnapsackGA {
 	private static final double PROB_MUTATION = 0.5;
 	private static final int TOURNAMENT_SIZE = 3;
 
-	private ThreadLocalRandom r = ThreadLocalRandom.current();
+	private Random r = new Random();
 
 	private Individual[] population = new Individual[POP_SIZE];
 
@@ -39,7 +38,7 @@ public class KnapsackGA {
 
 			// Step3 - Find parents to mate (cross-over)
 			Individual[] newPopulation = new Individual[POP_SIZE];
-			newPopulation[0] = population[0]; // The best individual remains
+			newPopulation[0] = best; // The best individual remains
 
 			for (int i = 1; i < POP_SIZE; i++) {
 				// We select two parents, using a tournament.
@@ -86,4 +85,5 @@ public class KnapsackGA {
 		}
 		return best;
 	}
+
 }

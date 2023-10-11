@@ -67,7 +67,7 @@ public class KnapsackGAPhaser {
 
                 // Step3 - Find parents to mate (cross-over)
                 //falta skipar o [0]
-                // newPopulation[0] = population[0]; // The best individual remains
+                // newPopulation[0] = best[0]; // The best individual remains
                 for (int i = start; i < end; i++) {
 
                     // We select two parents, using a tournament.

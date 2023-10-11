@@ -52,7 +52,7 @@ public class KnapsackGAParallelize {
 
 			// Step3 - Find parents to mate (cross-over)
 			Individual[] newPopulation = new Individual[POP_SIZE];
-			newPopulation[0] = population[0]; // The best individual remains
+			newPopulation[0] = best; // The best individual remains
 			// synchronized(newPopulation) {
 				Parallelize.parallelize((start, end) -> {
 					for (int i = start; i < end; i++) {			

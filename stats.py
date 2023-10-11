@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 df = pd.read_csv('results.csv')
 
 # Selecione a coluna do método sequencial
-sequencial_results = df['Sequencial']
+sequential_results = df['Sequential']
 
 # Inicialize uma lista para armazenar os p-values
 p_values = []
@@ -31,7 +31,7 @@ for column in df.columns[1:]:
 
 # Imprima os valores de p-value para cada comparação
 for i, column in enumerate(method_names):
-    print(f'P-Value ({column} vs Sequencial): {p_values[i]}')
+    print(f'P-Value ({column} vs Sequential): {p_values[i]}')
 
 
 # # compare samples
@@ -50,5 +50,6 @@ for i, column in enumerate(method_names):
 # print(f'Métodos com diferenças significativas em relação ao sequencial: {significant_methods}')
 
 # Crie um gráfico de boxplot
-plt.boxplot([sequencial_results] + [df[column] for column in method_names], labels=df.columns)
+plt.boxplot([sequential_results] + [df[column] for column in method_names], labels=df.columns)
+plt.xticks(fontsize=8)
 plt.show()

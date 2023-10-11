@@ -45,8 +45,9 @@ public class KnapsackGASynchronized {
 			
 			// Task2 - Print the best individual so far
 			final int generationFinal = generation;
+			Individual best;
 			synchronized (population) {
-				Individual best = bestOfPopulation();
+				best = bestOfPopulation();
 				System.out.println("Best at generation " + generationFinal + " is " + best + " with "
 						+ best.fitness);
 			}
@@ -54,7 +55,7 @@ public class KnapsackGASynchronized {
 			// Step3 - Find parents to mate (cross-over)
 			Individual[] newPopulation = new Individual[POP_SIZE];
 			synchronized (newPopulation) {
-				newPopulation[0] = population[0]; // The best individual remains
+				newPopulation[0] = best; // The best individual remains
 				Parallelize.parallelize((start, end) -> {
 					for (int i = start; i < end; i++) {            // We select two parents, using a tournament.
 						Individual parent1 = tournament(TOURNAMENT_SIZE, r);

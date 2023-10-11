@@ -13,18 +13,20 @@ public class Main {
 		try {
 			FileWriter csvWriter = new FileWriter("results.csv");
 			
-			int max_threads = Runtime.getRuntime().availableProcessors();
+			int maxThreads = Runtime.getRuntime().availableProcessors();
 
 			List<Integer> threads = new ArrayList<>();
 			int j = 2;
-			while (j <= max_threads) {
+			while (j <= maxThreads) {
 				threads.add(j);
 				j *= 2;
 			}
 
-			StringBuilder header = new StringBuilder("Sequencial");
+			// StringBuilder header = new StringBuilder("Sequential");
+			StringBuilder header = new StringBuilder();
 			for (int t : threads) {
-				header.append(", Parallelize:Thread " + t);
+				header.append("Parallelize:Thread " + t);
+				// header.append(", Parallelize:Thread " + t);
 				header.append(", Synchronized:Thread " + t);
 				header.append(", Phaser:Thread " + t);
 			}
@@ -32,9 +34,9 @@ public class Main {
 			
 			for (int i = 1; i <= ITERATIONS; i++) {
 				StringBuilder line = new StringBuilder();
-				System.out.println("Sequencial method iteration " + i);
-				long durationMethodSequencial = runKnapsackGASequencial();
-				line.append(durationMethodSequencial);
+				// System.out.println("Sequential method iteration " + i);
+				// long durationMethodSequencial = runKnapsackGASequencial();
+				// line.append(durationMethodSequencial);
 
 				long durationParallelize = 0;
 				long durationSynchronized = 0;
