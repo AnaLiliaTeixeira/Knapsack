@@ -29,8 +29,7 @@ public class KnapsackGAPhaser {
             population[i] = Individual.createRandom(r);
         }
     }
-
-    
+  
     public void run() {
         final Phaser phaser = new Phaser() {
             protected boolean onAdvance(int phase, int registeredParties) {
@@ -39,10 +38,7 @@ public class KnapsackGAPhaser {
         };
 
         for (int generation = 0; generation < N_GENERATIONS; generation++) {
-            // phaser.register();
             final int gen = generation;
-            // Individual[] newPopulation = new Individual[POP_SIZE];
-            // newPopulation[0] = population[0]; // The best individual remains
             Individual[] newPopulation = population;
 
             Parallelize.parallelize((start, end) -> {
@@ -66,8 +62,6 @@ public class KnapsackGAPhaser {
                 phaser.arriveAndAwaitAdvance(); // End of step 2
 
                 // Step3 - Find parents to mate (cross-over)
-                //falta skipar o [0]
-                // newPopulation[0] = best[0]; // The best individual remains
                 for (int i = start; i < end; i++) {
 
                     // We select two parents, using a tournament.
@@ -84,16 +78,11 @@ public class KnapsackGAPhaser {
                     }
                 }           
                 phaser.arriveAndAwaitAdvance(); // End of step 4
-
-                // synchronized(population) {}
-                population = newPopulation;
-                
+                population = newPopulation;      
                 phaser.arriveAndDeregister(); // End of the barrier
+
             }, POP_SIZE, NUM_THREADS, threads, 0);
-            // System.arraycopy(newPopulation, 0, population, 0, POP_SIZE);
-
         }
-
     }
 
     private Individual tournament(int tournamentSize, Random r) {
@@ -110,20 +99,6 @@ public class KnapsackGAPhaser {
         }
         return best;
     }
-
-    // se paralelizar esta função fica mais lento
-    // private Individual bestOfPopulation(Individual[] newPopulation) {
-    //     /*
-    //      * Returns the best individual of the population.
-    //      */
-    //     Individual best = newPopulation[0];
-    //     for (Individual other : newPopulation) {
-    //         if (other.fitness > best.fitness) {
-    //             best = other;
-    //         }
-    //     }
-    //     return best;
-    // }
 
     // Updated method to find the best individual in a specific range
     private Individual bestOfPopulation(int start, int end) {

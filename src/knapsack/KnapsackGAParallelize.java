@@ -1,7 +1,6 @@
 package knapsack;
 
 import java.util.Random;
-import java.util.concurrent.Phaser;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class KnapsackGAParallelize {
@@ -53,30 +52,26 @@ public class KnapsackGAParallelize {
 			// Step3 - Find parents to mate (cross-over)
 			Individual[] newPopulation = new Individual[POP_SIZE];
 			newPopulation[0] = best; // The best individual remains
-			// synchronized(newPopulation) {
-				Parallelize.parallelize((start, end) -> {
-					for (int i = start; i < end; i++) {			
-						// We select two parents, using a tournament.
-						Individual parent1 = tournament(TOURNAMENT_SIZE, r);
-						Individual parent2 = tournament(TOURNAMENT_SIZE, r);
-			
-						newPopulation[i] = parent1.crossoverWith(parent2, r);
-					}
-				}, POP_SIZE, NUM_THREADS, threads, 1);
-			// }
+			Parallelize.parallelize((start, end) -> {
+				for (int i = start; i < end; i++) {			
+					// We select two parents, using a tournament.
+					Individual parent1 = tournament(TOURNAMENT_SIZE, r);
+					Individual parent2 = tournament(TOURNAMENT_SIZE, r);
+		
+					newPopulation[i] = parent1.crossoverWith(parent2, r);
+				}
+			}, POP_SIZE, NUM_THREADS, threads, 1);
 
 			// Step4 - Mutate
-			// synchronized(newPopulation) {
-				Parallelize.parallelize((start, end) -> {
-					for (int i = start; i < end; i++) {
-						if (r.nextDouble() < PROB_MUTATION) {
-							newPopulation[i].mutate(r);
-						}
+			Parallelize.parallelize((start, end) -> {
+				for (int i = start; i < end; i++) {
+					if (r.nextDouble() < PROB_MUTATION) {
+						newPopulation[i].mutate(r);
 					}
-				}, POP_SIZE, NUM_THREADS, threads, 1);
+				}
+			}, POP_SIZE, NUM_THREADS, threads, 1);
 
-				population = newPopulation;
-			// }
+			population = newPopulation;
 		}
 	}
 

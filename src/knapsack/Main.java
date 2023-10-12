@@ -22,11 +22,9 @@ public class Main {
 				j *= 2;
 			}
 
-			// StringBuilder header = new StringBuilder("Sequential");
-			StringBuilder header = new StringBuilder();
+			StringBuilder header = new StringBuilder("Sequential");
 			for (int t : threads) {
-				header.append("Parallelize:Thread " + t);
-				// header.append(", Parallelize:Thread " + t);
+				header.append(", Parallelize:Thread " + t);
 				header.append(", Synchronized:Thread " + t);
 				header.append(", Phaser:Thread " + t);
 			}
@@ -34,9 +32,9 @@ public class Main {
 			
 			for (int i = 1; i <= ITERATIONS; i++) {
 				StringBuilder line = new StringBuilder();
-				// System.out.println("Sequential method iteration " + i);
-				// long durationMethodSequencial = runKnapsackGASequencial();
-				// line.append(durationMethodSequencial);
+				System.out.println("Sequential method iteration " + i);
+				long durationMethodSequential = runKnapsackGASequential();
+				line.append(durationMethodSequential);
 
 				long durationParallelize = 0;
 				long durationSynchronized = 0;
@@ -65,7 +63,7 @@ public class Main {
 		}
 	}
 
-	private static long runKnapsackGASequencial () {
+	private static long runKnapsackGASequential () {
 		long startTime = System.nanoTime();
 		KnapsackGA method = new KnapsackGA();
 		method.run();
@@ -96,5 +94,4 @@ public class Main {
 		long endTime = System.nanoTime();
 		return endTime - startTime;
 	}
-
 }
